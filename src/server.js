@@ -1,13 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import connectDB from './config/db.js';
+import treatmentRoutes from './routes/treatmentRoutes.js';
+import appointmentRoutes from './routes/appointmentRoutes.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-// Middleware
+// Connect to MongoDB Atlas
+connectDB();
+  
+// CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -16,7 +23,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl) or when CLIENT_URL is '*'
     if (!origin || process.env.CLIENT_URL === '*' || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com')) {
       return callback(null, true);
     }
@@ -24,28 +30,42 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Basic Health Check Route
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Health Check & Database Status Route
 app.get('/api/health', (req, res) => {
+  const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  const stateIndex = mongoose.connection.readyState;
   res.status(200).json({
     status: 'success',
-    message: 'Aevora Backend Server is running smoothly!',
+    server: 'healthy',
+    database: {
+      status: dbStates[stateIndex] || 'unknown',
+      connected: stateIndex === 1,
+      name: mongoose.connection.name || 'aevora',
+      host: mongoose.connection.host || 'MongoDB Atlas'
+    },
     timestamp: new Date().toISOString()
   });
 });
 
-// Sample API Route for testing
+// Mount Routes
+app.use('/api/treatments', treatmentRoutes);
+app.use('/api/appointments', appointmentRoutes);
+
+// General Info Route
 app.get('/api/info', (req, res) => {
   res.status(200).json({
-    app: 'Aevora Website Backend',
-    version: '1.0.0',
-    features: ['Authentication Ready', 'RESTful API Architecture', 'CORS Enabled']
+    app: 'Aevora Aesthetics & Longevity API',
+    version: '1.1.0',
+    database: 'MongoDB Atlas',
+    features: ['Treatments Management', 'Lead Capturing', 'Admin CMS Backend']
   });
 });
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`🚀 Server is listening on http://localhost:${PORT}`);
+  console.log(`🚀 Aevora Server running on http://localhost:${PORT}`);
 });
