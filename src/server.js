@@ -1,15 +1,23 @@
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import treatmentRoutes from './routes/treatmentRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
+import pageRoutes from './routes/pageRoutes.js';
+import settingRoutes from './routes/settingRoutes.js';
+import mediaRoutes from './routes/mediaRoutes.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Connect to MongoDB Atlas
 connectDB();
@@ -34,6 +42,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Serve static uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // Health Check & Database Status Route
 app.get('/api/health', (req, res) => {
   const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
@@ -54,6 +65,9 @@ app.get('/api/health', (req, res) => {
 // Mount Routes
 app.use('/api/treatments', treatmentRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/pages', pageRoutes);
+app.use('/api/settings', settingRoutes);
+app.use('/api/media', mediaRoutes);
 
 // General Info Route
 app.get('/api/info', (req, res) => {

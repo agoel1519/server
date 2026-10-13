@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 
+// Disable buffering so failed DB connection does not stall requests for 10 seconds
+mongoose.set('bufferCommands', false);
+
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
