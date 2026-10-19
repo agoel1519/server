@@ -103,6 +103,10 @@ const initialTreatments = [
 // Initial default popup settings
 const initialPopupSettings = {
   enabled: true,
+  imageUrl: 'https://res.cloudinary.com/fryxycyd/image/upload/v1792070508/aevora/u3jstd6evnqcaijchuja.jpg',
+  whatsappNumber: '+91 97797 66933',
+  whatsappMessage: 'Hi Aevora, I am interested in your Inaugural Offer and would like to know more / book a consultation.',
+  buttonText: 'WhatsApp Now',
   layout: 'banner',
   badge: 'SPECIAL ANNOUNCEMENT',
   title: 'Radiance Reimagined at Aevora',
@@ -111,9 +115,9 @@ const initialPopupSettings = {
   ctaText: 'Book Free Consultation',
   ctaLink: '#book',
   secondaryCtaText: 'WhatsApp Us',
-  secondaryCtaLink: 'https://wa.me/919876543210?text=Hi%2C%20I%20would%20like%20to%20know%20more%20about%20Aevora%20treatments',
-  displayDelay: 2,
-  displayFrequency: 'session',
+  secondaryCtaLink: 'https://wa.me/919779766933?text=Hi%2C%20I%20would%20like%20to%20know%20more%20about%20Aevora%20treatments',
+  displayDelay: 1,
+  displayFrequency: 'always',
   targetPage: 'all',
   autoPlay: true,
   autoPlayInterval: 4,
