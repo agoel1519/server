@@ -77,7 +77,7 @@
           "id": "2",
           "label": "ABOUT",
           "url": "/about",
-          "type": "dropdown",
+          "type": "link",
           "dropdownItems": [
             {
               "id": "a-2",
@@ -1078,7 +1078,7 @@
         "phones": [
           "+91 97797 66933"
         ],
-        "email": "concierge@aevoraclinics.com",
+        "email": "contact@aevoraclinics.com",
         "hours": "Mon – Sat: 10:00 AM – 8:00 PM | Sun: By Appointment"
       },
       "accordionSection": {
