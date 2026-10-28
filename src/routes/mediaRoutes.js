@@ -60,7 +60,9 @@ router.post('/', upload.single('file'), async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const fileUrl = `http://localhost:5001/uploads/${req.file.filename}`;
+    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.get('host') || 'localhost:5001';
+    const fileUrl = `${proto}://${host}/uploads/${req.file.filename}`;
 
     const mediaData = {
       filename: req.file.filename,

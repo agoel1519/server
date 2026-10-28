@@ -7,6 +7,25 @@ const router = express.Router();
 
 const isMongoOnline = () => mongoose.connection.readyState === 1;
 
+// Get all settings
+router.get('/', async (req, res) => {
+  if (isMongoOnline()) {
+    try {
+      const settings = await Setting.find({});
+      if (settings && settings.length > 0) {
+        const obj = {};
+        settings.forEach(s => { obj[s.key] = s.value; });
+        return res.json({ success: true, count: settings.length, data: obj, source: 'mongodb' });
+      }
+    } catch (err) {
+      console.warn('MongoDB fetch all settings notice:', err.message);
+    }
+  }
+
+  const raw = localStore.loadRawStore();
+  return res.json({ success: true, data: raw.settings || {}, source: 'local' });
+});
+
 // Get setting by key
 router.get('/:key', async (req, res) => {
   const { key } = req.params;
@@ -17,7 +36,7 @@ router.get('/:key', async (req, res) => {
       if (setting) {
         // Keep local cache synced
         localStore.saveSetting(key, setting.value);
-        return res.json(setting);
+        return res.json({ key: setting.key, value: setting.value, source: 'mongodb' });
       }
     } catch (err) {
       console.warn(`MongoDB fetch notice for ${key}, falling back to localStore:`, err.message);
@@ -39,7 +58,7 @@ router.put('/:key', async (req, res) => {
   const { value } = req.body;
 
   // Always persist locally first so edits are never lost
-  const localResult = localStore.saveSetting(key, value);
+  localStore.saveSetting(key, value);
 
   if (isMongoOnline()) {
     try {
@@ -48,14 +67,19 @@ router.put('/:key', async (req, res) => {
         { value },
         { new: true, upsert: true }
       );
-      return res.json(setting);
+      return res.json({
+        success: true,
+        key: setting.key,
+        value: setting.value,
+        source: 'mongodb'
+      });
     } catch (err) {
       console.warn(`MongoDB update notice for ${key}, saved to local store:`, err.message);
-      return res.json({ key, value, offlineFallback: true });
+      return res.json({ success: true, key, value, offlineFallback: true, error: err.message });
     }
   }
 
-  res.json({ key, value, offlineFallback: true });
+  res.json({ success: true, key, value, offlineFallback: true, warning: 'MongoDB is offline' });
 });
 
 export default router;

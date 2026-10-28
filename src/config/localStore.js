@@ -210,6 +210,8 @@ const saveStore = () => {
 };
 
 export const localStore = {
+  loadRawStore: () => loadStore(),
+
   // Settings API
   getSetting: (key) => {
     const store = loadStore();
